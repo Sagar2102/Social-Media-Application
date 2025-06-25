@@ -13,6 +13,8 @@ import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
+import { useDispatch, useSelector } from "react-redux";
+import { setAuthUser } from "@/redux/authSlice";
 // import { useDispatch, useSelector } from "react-redux";
 // import { setAuthUser } from "@/redux/authSlice";
 // import CreatePost from "./CreatePost";
@@ -24,6 +26,8 @@ import { toast } from "sonner";
 
 const LeftSidebar = () => {
     const navigate = useNavigate();
+    const {user}=useSelector(store=>store.auth);
+    const dispatch=useDispatch();
     const sidebarItems = [
       { icon: <Home />, text: "Home" },
       { icon: <Search />, text: "Search" },
@@ -34,7 +38,7 @@ const LeftSidebar = () => {
       {
         icon: (
           <Avatar className="w-6 h-6">
-            <AvatarImage src="https://github.com/shadcn.png" alt="@shadcn" />
+            <AvatarImage src={user?.profilePicture} alt="@shadcn" />
             <AvatarFallback>CN</AvatarFallback>
           </Avatar>
         ),
@@ -47,7 +51,7 @@ const LeftSidebar = () => {
             try {
                 const res = await axios.get('http://localhost:8000/api/v1/user/logout', { withCredentials: true });
                 if (res.data.success) {
-                    // dispatch(setAuthUser(null));
+                    dispatch(setAuthUser(null));
                     // dispatch(setSelectedPost(null));
                     // dispatch(setPosts([]));
                     navigate("/login");
@@ -62,16 +66,7 @@ const LeftSidebar = () => {
     const sidebarHandler = (textType) => {
             if (textType === 'Logout') {
                 logoutHandler();}
-            //  else if (textType === "Create") {
-            //     setOpen(true);
-            // } else if (textType === "Profile") {
-            //     navigate(`/profile/${user?._id}`);
-            // } else if (textType === "Home") {
-            //     navigate("/");
-            // } else if (textType === 'Messages') {
-            //     navigate("/chat");
-            // }
-            // alert(textType);
+            
         }
   return (
     <div className="fixed top-0 z-10 left-0 px-4 border-r border-gray-300 w-[16%] h-screen">
