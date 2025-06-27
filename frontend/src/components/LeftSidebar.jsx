@@ -17,7 +17,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { setAuthUser } from "@/redux/authSlice";
 // import { useDispatch, useSelector } from "react-redux";
 // import { setAuthUser } from "@/redux/authSlice";
-// import CreatePost from "./CreatePost";
+import CreatePost from "./CreatePost";
 // import { setPosts, setSelectedPost } from "@/redux/postSlice";
 // import { Popover, PopoverContent, PopoverTrigger } from "./ui/popover";
 // import { Button } from "./ui/button";
@@ -28,6 +28,7 @@ const LeftSidebar = () => {
     const navigate = useNavigate();
     const {user}=useSelector(store=>store.auth);
     const dispatch=useDispatch();
+    const [open, setOpen] = useState(false);
     const sidebarItems = [
       { icon: <Home />, text: "Home" },
       { icon: <Search />, text: "Search" },
@@ -66,6 +67,9 @@ const LeftSidebar = () => {
     const sidebarHandler = (textType) => {
             if (textType === 'Logout') {
                 logoutHandler();}
+                else if (textType === "Create") {
+            setOpen(true);
+        }
             
         }
   return (
@@ -89,7 +93,8 @@ const LeftSidebar = () => {
         </div>
       </div>
 
-      
+                  <CreatePost open={open} setOpen={setOpen} />
+
     </div>
   );
 };

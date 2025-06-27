@@ -1,15 +1,18 @@
-import { Avatar } from "@radix-ui/react-avatar";
 import React, { useState } from "react";
-import { AvatarFallback, AvatarImage } from "./ui/avatar";
+import { Avatar, AvatarFallback, AvatarImage } from './ui/avatar'
 import { Dialog, DialogContent, DialogTrigger } from "./ui/dialog";
 import { FaHeart, FaRegHeart } from "react-icons/fa";
 import { Bookmark, MessageCircle, MoreHorizontal, Send } from "lucide-react";
 import { Button } from "./ui/button";
 import CommentDialog from "./CommentDialog";
-
-const Post = () => {
+import { useDispatch, useSelector } from 'react-redux'
+import axios from 'axios'
+import { toast } from 'sonner'
+const Post = ({post}) => {
     const [text,setText]=useState("");
     const [open, setOpen] = useState(false);
+     const { user } = useSelector(store => store.auth)
+       const dispatch = useDispatch();
     const changeEventHandler=(e)=>{
         const inputText = e.target.value;
         if (inputText.trim()) {
@@ -18,15 +21,17 @@ const Post = () => {
             setText("");
         }
     }
+    console.log("Cloudinary Image URL:", post.image);
+
   return (
     <div className="my-8 w-full max-w-sm mx-auto">
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2">
           <Avatar>
-            <AvatarImage src="" alt="post_image" />
+            <AvatarImage src={post.author?.profilePicture} alt="post_image" />
             <AvatarFallback>CN</AvatarFallback>
           </Avatar>
-          <h1>username</h1>
+          <h1>{post.author?.username}</h1>
         </div>
         <Dialog>
           <DialogTrigger asChild>
@@ -42,15 +47,17 @@ const Post = () => {
             <Button variant="ghost" className="cursor-pointer w-fit ">
               Add to Favourites
             </Button>
-            <Button variant="ghost" className="cursor-pointer w-fit ">
-              Delete
-            </Button>
+              {
+                            user && user?._id === post?.author._id && <Button  variant='ghost' className="cursor-pointer w-fit">Delete</Button>
+                        }
           </DialogContent>
         </Dialog>
       </div>
+      {!post.image && <p className="text-red-500">No image found for this post.</p>}
+
       <img
         className="rounded-sm my-2 w-full aspect-square object-cover"
-        src="https://img.freepik.com/free-photo/closeup-scarlet-macaw-from-side-view-scarlet-macaw-closeup-head_488145-3540.jpg?semt=ais_hybrid&w=740"
+        src={post.image}
         alt="post_image"
       />
       
@@ -62,10 +69,10 @@ const Post = () => {
           </div>
           <Bookmark className="cursor-pointer hover:text-gray-600" />
         </div>
-        <span className='font-medium block mb-2'>1K likes</span>
+        <span className='font-medium block mb-2'>{post.likes.length} likes</span>
         <p>
-            <span className=" font-medium mr-2">username</span>
-            caption
+            <span className=" font-medium mr-2">{post.author?.username}</span>
+           {post.caption}
         </p>
         <span onClick={()=>setOpen(true)} className="cursor-pointer text-sm text-gray-400">View all 10 comments</span>
         <CommentDialog open={open} setOpen={setOpen}/>
