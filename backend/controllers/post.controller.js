@@ -12,14 +12,30 @@ export const addNewPost = async (req, res) => {
         if (!image) return res.status(400).json({ message: 'Image required' });
 
         // image upload 
-        const optimizedImageBuffer = await sharp(image.buffer)
-            .resize({ width: 800, height: 800, fit: 'inside' })
-            .toFormat('jpeg', { quality: 80 })
-            .toBuffer();
+        // const optimizedImageBuffer = await sharp(image.buffer)
+        //     .resize({ width: 800, height: 800, fit: 'inside' })
+        //     .toFormat('jpeg', { quality: 80 })
+        //     .toBuffer();
 
-        // buffer to data uri
-        const fileUri = `data:image/jpeg;base64,${optimizedImageBuffer.toString('base64')}`;
-        const cloudResponse = await cloudinary.uploader.upload(fileUri);
+        // // buffer to data uri
+        // const fileUri = `data:image/jpeg;base64,${optimizedImageBuffer.toString('base64')}`;
+        // const cloudResponse = await cloudinary.uploader.upload(fileUri);\
+        const cloudResponse = await new Promise((resolve, reject) => {
+  const uploadStream = cloudinary.uploader.upload_stream(
+    { folder: "social-posts" },
+    (error, result) => {
+      if (error) return reject(error);
+      resolve(result);
+    }
+  );
+
+  // Pipe the sharp-optimized image buffer directly to Cloudinary
+  sharp(image.buffer)
+    .resize({ width: 800, height: 800, fit: "inside" })
+    .toFormat("jpeg", { quality: 80 })
+    .pipe(uploadStream);
+});
+
         const post = await Post.create({
             caption,
             image: cloudResponse.secure_url,
