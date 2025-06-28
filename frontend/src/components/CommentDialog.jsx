@@ -1,15 +1,25 @@
 import { Dialog } from "@radix-ui/react-dialog";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { DialogContent, DialogTrigger } from "./ui/dialog";
-import { Avatar } from "@radix-ui/react-avatar";
-import { AvatarFallback, AvatarImage } from "./ui/avatar";
+import { Avatar, AvatarFallback, AvatarImage } from './ui/avatar'
 import { Link } from "react-router-dom";
 import { MoreHorizontal } from "lucide-react";
+import Comment from './Comment'
 import { Button } from "./ui/button";
-
+import axios from 'axios'
+import { toast } from 'sonner'
+import { setPosts } from '@/redux/postSlice'
+import { useDispatch, useSelector } from 'react-redux'
 const CommentDialog = ({ open, setOpen }) => {
     const [text, setText] = useState("");
-
+  const { selectedPost, posts } = useSelector(store => store.post);
+  const [comment, setComment] = useState([]);
+  const dispatch = useDispatch();
+    useEffect(() => {
+    if (selectedPost) {
+      setComment(selectedPost.comments);
+    }
+  }, [selectedPost]);
     const changeEventHandler = (e) => {
     const inputText = e.target.value;
     if (inputText.trim()) {
@@ -18,8 +28,30 @@ const CommentDialog = ({ open, setOpen }) => {
       setText("");
     }
   }
-  const sendMessageHandler=async()=>{
-    alert(text);
+ const sendMessageHandler = async () => {
+
+    try {
+      const res = await axios.post(`http://localhost:8000/api/v1/post/${selectedPost?._id}/comment`, { text }, {
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        withCredentials: true
+      });
+
+      if (res.data.success) {
+        const updatedCommentData = [...comment, res.data.comment];
+        setComment(updatedCommentData);
+
+        const updatedPostData = posts.map(p =>
+          p._id === selectedPost._id ? { ...p, comments: updatedCommentData } : p
+        );
+        dispatch(setPosts(updatedPostData));
+        toast.success(res.data.message);
+        setText("");
+      }
+    } catch (error) {
+      console.log(error);
+    }
   }
 
   return (
@@ -32,7 +64,7 @@ const CommentDialog = ({ open, setOpen }) => {
           <div className="w-1/2">
             <img
               className="w-full h-full object-cover rounded-l-lg"
-              src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTUsbmTZu_uMrmJ0z--CrG-o1UIXytu1OCizQ&s"
+              src={selectedPost?.image}
               alt="post_image"
             />
           </div>
@@ -42,12 +74,12 @@ const CommentDialog = ({ open, setOpen }) => {
               <div className="flex gap-3 items-center">
                 <Link>
                   <Avatar>
-                    <AvatarImage src="" />
+                     <AvatarImage src={selectedPost?.author?.profilePicture} />
                     <AvatarFallback>CN</AvatarFallback>
                   </Avatar>
                 </Link>
                 <div>
-                  <Link className="font-semibold text-xs">username</Link>
+                  <Link className="font-semibold text-xs">{selectedPost?.author?.username}</Link>
                   {/* <span className="text-gray-600 text-sm">Bio here...</span> */}
                 </div>
               </div>
@@ -66,8 +98,10 @@ const CommentDialog = ({ open, setOpen }) => {
               </Dialog>
             </div>
             <hr/>
-            <div className="flex-1 overflow-auto max-h-96 p-4">
-                Comments Ayenge
+             <div className='flex-1 overflow-y-auto max-h-96 p-4'>
+              {
+                 comment.map((comment) => <Comment key={comment._id} comment={comment} />)
+              }
             </div>
             <div className="p-4">
                 <div className='flex items-center gap-2'>
