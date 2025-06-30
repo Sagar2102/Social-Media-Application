@@ -4,6 +4,7 @@ import Signup from './components/Signup.jsx'
 import Login from './components/Login.jsx'
 import { createBrowserRouter, RouterProvider } from 'react-router-dom'
 import Profile from './components/Profile.jsx'
+import EditProfile from './components/EditProfile.jsx'
 
 const browserRouter = createBrowserRouter([
   {
@@ -15,13 +16,13 @@ const browserRouter = createBrowserRouter([
         element: <Home />
       },
       {
-        path: '/profile',
+        path: '/profile/:id',
         element:  <Profile />
       },
-      // {
-      //   path: '/account/edit',
-      //   element: <EditProfile />
-      // },
+      {
+        path: '/account/edit',
+        element: <EditProfile />
+      },
       // {
       //   path: '/chat',
       //   element: <ChatPage />

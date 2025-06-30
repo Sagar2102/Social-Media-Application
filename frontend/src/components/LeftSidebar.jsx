@@ -69,7 +69,12 @@ const LeftSidebar = () => {
                 else if (textType === "Create") {
             setOpen(true);
         }
-            
+        else if (textType === "Profile") {
+            navigate(`/profile/${user?._id}`);
+        }
+            else if (textType === "Home") {
+            navigate("/");
+        }
         }
   return (
     <div className="fixed top-0 z-10 left-0 px-4 border-r border-gray-300 w-[16%] h-screen">
