@@ -1,3 +1,4 @@
+import { useEffect } from 'react'
 import Home from './components/Home.jsx'
 import MainLayout from './components/MainLayout.jsx'
 import Signup from './components/Signup.jsx'
@@ -6,7 +7,11 @@ import { createBrowserRouter, RouterProvider } from 'react-router-dom'
 import Profile from './components/Profile.jsx'
 import EditProfile from './components/EditProfile.jsx'
 import ChatPage from './components/ChatPage.jsx'
-
+import { io } from "socket.io-client";
+import { useDispatch, useSelector } from 'react-redux'
+import { setSocket } from './redux/socketSlice'
+import { setOnlineUsers } from './redux/chatSlice'
+import { setLikeNotification } from './redux/rtnSlice.js'
 const browserRouter = createBrowserRouter([
   {
     path: "/",
@@ -42,8 +47,39 @@ const browserRouter = createBrowserRouter([
 
 
 function App() {
+  const { user } = useSelector(store => store.auth);
+    const dispatch = useDispatch();
+     const { socket } = useSelector(store => store.socketio);
+ useEffect(() => {
+    if (user) {
+      const socketio = io('http://localhost:8000', {
+        query: {
+          userId: user?._id
+        },
+        transports: ['websocket']
+      });
+      dispatch(setSocket(socketio));
 
-  return (
+      // listen all the events
+      socketio.on('getOnlineUsers', (onlineUsers) => {
+        dispatch(setOnlineUsers(onlineUsers));
+      });
+
+      socketio.on('notification', (notification) => {
+        dispatch(setLikeNotification(notification));
+      });
+
+      return () => {
+        socketio.close();
+        dispatch(setSocket(null));
+      }
+    } else if (socket) {
+      socket.close();
+      dispatch(setSocket(null));
+    }
+  }, [user, dispatch]);
+ 
+     return (
     <>
       <RouterProvider router={browserRouter} />
       

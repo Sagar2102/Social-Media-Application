@@ -92,7 +92,7 @@ const commentHandler = async () => {
     }
 
     // console.log("Cloudinary Image URL:", post.image);
-
+   
   return (
     <div className="my-8 w-full max-w-sm mx-auto">
       <div className="flex items-center justify-between">
