@@ -26,14 +26,14 @@ const SuggestedUsers = () => {
             }));
 
             // Toggle follow/unfollow
-            const res = await axios.post(`http://localhost:8000/api/v1/user/followorunfollow/${targetId}`, {}, {
+            const res = await axios.post(`https://social-media-application-6vg0.onrender.com/api/v1/user/followorunfollow/${targetId}`, {}, {
                 withCredentials: true,
             });
 
             toast.success(res.data.message);
 
             // Refetch updated user data
-            const updated = await axios.get('http://localhost:8000/api/v1/user/me', {
+            const updated = await axios.get('https://social-media-application-6vg0.onrender.com/api/v1/user/me', {
                 withCredentials: true,
             });
             dispatch(setAuthUser(updated.data.user));

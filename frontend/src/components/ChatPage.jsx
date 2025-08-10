@@ -25,7 +25,7 @@ const ChatPage = () => {
 
     const sendMessageHandler = async (receiverId) => {
         try {
-            const res = await axios.post(`http://localhost:8000/api/v1/message/send/${receiverId}`, { textMessage }, {
+            const res = await axios.post(`https://social-media-application-6vg0.onrender.com/api/v1/message/send/${receiverId}`, { textMessage }, {
                 headers: {
                     'Content-Type': 'application/json'
                 },
@@ -60,7 +60,7 @@ const ChatPage = () => {
 
     const fetchUserData = async (userId) => {
         try {
-            const res = await axios.get(`http://localhost:8000/api/v1/user/profile/${userId}`, {
+            const res = await axios.get(`https://social-media-application-6vg0.onrender.com/api/v1/user/profile/${userId}`, {
                 withCredentials: true
             });
             if (res.data.success) {
